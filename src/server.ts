@@ -7,6 +7,10 @@ import { generateAICompletionRoute } from "./routes/generate-ai-completion";
 
 const app = fastify();
 
+app.register(fastifyCors, {
+  origin: "*",
+});
+
 app.register(getAllPromptsRoute);
 app.register(uploadVideoRoute);
 app.register(createTranscriptionRoute);
