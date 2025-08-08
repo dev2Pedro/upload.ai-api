@@ -30,7 +30,18 @@ export async function createTranscriptionRoute(app: FastifyInstance) {
         prompt: prompt || "",
       });
 
-      return { text: response.text };
+      await prisma.video.update({
+        where: {
+          id: videoId,
+        },
+        data: {
+          transcription: response.text,
+        },
+      });
+
+      const transcription = response.text;
+
+      return { transcription };
     } catch (error: any) {
       console.error("Erro na transcrição:", error);
       reply.status(500).send({
