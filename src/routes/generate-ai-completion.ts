@@ -1,8 +1,9 @@
+// generate-ai-completion.ts
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
-import { createReadStream } from "node:fs";
+import { streamText, pipeTextStreamToResponse } from "ai";
 import { z } from "zod";
-import { groq } from "../lib/groq";
+import { groqProvider } from "../lib/ai";
 
 export async function generateAICompletionRoute(app: FastifyInstance) {
   app.post("/ai/complete", async (req, reply) => {
@@ -11,12 +12,11 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
       template: z.string(),
       temperature: z.number().min(0).max(1).default(0.5),
     });
+
     const { videoId, template, temperature } = bodySchema.parse(req.body);
 
     const video = await prisma.video.findUniqueOrThrow({
-      where: {
-        id: videoId,
-      },
+      where: { id: videoId },
     });
 
     if (!video.transcription) {
@@ -30,12 +30,24 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
       video.transcription
     );
 
-    const response = await groq.chat.completions.create({
-      model: "llama3-70b-8192",
-      temperature,
-      messages: [{ role: "user", content: promptMessage }],
-    });
+    try {
+      const { textStream } = await streamText({
+        model: groqProvider("llama3-70b-8192"),
+        temperature,
+        messages: [{ role: "user", content: promptMessage }],
+      });
 
-    return response;
+      pipeTextStreamToResponse({
+        textStream,
+        response: reply.raw,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        },
+      });
+    } catch (error) {
+      console.error("Erro ao chamar a API da Groq:", error);
+      return reply.status(500).send({ error: "Falha ao comunicar com a IA." });
+    }
   });
 }

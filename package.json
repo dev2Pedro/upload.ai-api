@@ -2,20 +2,23 @@
   "devDependencies": {
     "@types/node": "^24.2.0",
     "dotenv": "^17.2.1",
-    "prisma": "^6.13.0",
+    "prisma": "^6.14.0",
     "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
-  "scripts": {
-    "dev": "tsx watch src/server.ts"
-  },
   "dependencies": {
+    "@ai-sdk/groq": "^2.0.7",
     "@fastify/cors": "^11.1.0",
     "@fastify/multipart": "^9.0.3",
-    "@prisma/client": "^6.13.0",
+    "@prisma/client": "^6.14.0",
+    "ai": "^5.0.12",
     "fastify": "^5.4.0",
     "groq-sdk": "^0.30.0",
     "openai": "^5.12.1",
     "zod": "^4.0.15"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "seed": "npx prisma generate && tsx prisma/seed.ts"
   }
 }
