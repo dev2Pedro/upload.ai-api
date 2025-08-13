@@ -1,4 +1,3 @@
-// generate-ai-completion.ts
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
 import { streamText, pipeTextStreamToResponse } from "ai";
@@ -9,11 +8,11 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
   app.post("/ai/complete", async (req, reply) => {
     const bodySchema = z.object({
       videoId: z.string().uuid(),
-      template: z.string(),
+      prompt: z.string(),
       temperature: z.number().min(0).max(1).default(0.5),
     });
 
-    const { videoId, template, temperature } = bodySchema.parse(req.body);
+    const { videoId, prompt, temperature } = bodySchema.parse(req.body);
 
     const video = await prisma.video.findUniqueOrThrow({
       where: { id: videoId },
@@ -25,7 +24,7 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
         .send({ error: "Video transcription was not generated yet." });
     }
 
-    const promptMessage = template.replace(
+    const promptMessage = prompt.replace(
       "{transcription}",
       video.transcription
     );
@@ -37,7 +36,7 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
         messages: [{ role: "user", content: promptMessage }],
       });
 
-      pipeTextStreamToResponse({
+      return pipeTextStreamToResponse({
         textStream,
         response: reply.raw,
         headers: {
