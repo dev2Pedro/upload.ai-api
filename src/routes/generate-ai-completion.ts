@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { prisma } from "../lib/prisma";
-import { streamText, pipeTextStreamToResponse } from "ai";
 import { z } from "zod";
+import { generateText } from "ai";
 import { groqProvider } from "../lib/ai";
 
 export async function generateAICompletionRoute(app: FastifyInstance) {
@@ -30,19 +30,14 @@ export async function generateAICompletionRoute(app: FastifyInstance) {
     );
 
     try {
-      const { textStream } = await streamText({
+      const result = await generateText({
         model: groqProvider("llama3-70b-8192"),
         temperature,
-        messages: [{ role: "user", content: promptMessage }],
+        prompt: promptMessage,
       });
 
-      return pipeTextStreamToResponse({
-        textStream,
-        response: reply.raw,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        },
+      return reply.send({
+        result: result.text,
       });
     } catch (error) {
       console.error("Erro ao chamar a API da Groq:", error);
