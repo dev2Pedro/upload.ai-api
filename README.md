@@ -2,25 +2,18 @@
 
 Esta API permite o upload de vídeos, transcrição automática com o **Whisper Large v3** e aplicação de prompts de IA para gerar resumos, títulos, descrições, sugestões e muito mais — tudo via **requisições HTTP**. Ideal para integrações com frontends ou automações via scripts.
 
----
-
-### 🚀 Tecnologias Utilizadas
+## 🚀 Tecnologias Utilizadas
 
 <p align="left">
   <img src="https://skillicons.dev/icons?i=nodejs,fastify,prisma" />
 </p>
 
-#### 🤖 IA & Processamento de Linguagem
+### 🤖 IA & Processamento de Linguagem
+- 🟢 **Groq API** - Para processamento rápido de IA
+- 🦙 **LLaMA** - Modelo de linguagem avançado
+- 🎤 **Whisper Large v3** - Transcrição de alta precisão
 
-<p align="left">
-  🟢 Groq API <br />
-  🦙 LLaMA <br />
-  🎤 Whisper Large v3
-</p>
-
----
-
-## 📥 Como clonar o projeto
+## 📥 Instalação
 
 ```bash
 # Clonar o repositório
@@ -33,78 +26,133 @@ cd sua-api
 npm install
 ```
 
-▶️ Como rodar o projeto
+## ▶️ Como executar
+
 ```bash
 # Iniciar o servidor em modo desenvolvimento
 npm run dev
 ```
-A API estará disponível em: http://localhost:3000
 
-📡 Principais Endpoints
+A API estará disponível em: **http://localhost:3000**
 
-`POST /upload`
+## 📡 Endpoints da API
+
+### `POST /upload`
 Faz o upload de um vídeo para transcrição e processamento.
 
-Body: `multipart/form-data` com arquivo de vídeo.
+- **Body**: `multipart/form-data` com arquivo de vídeo
+- **Retorno**: ID do processamento iniciado
 
-Retorno: ID do processamento iniciado.
+**Exemplo:**
+```bash
+curl -X POST http://localhost:3000/upload \
+  -F "video=@meu-video.mp4"
+```
 
-`GET /transcription/:id`
+### `GET /transcription/:id`
 Retorna a transcrição do vídeo processado com Whisper Large v3.
 
-Params: `id` — ID do vídeo.
+- **Parâmetros**: `id` — ID do vídeo
+- **Retorno**: Texto transcrito
 
-Retorno: Texto transcrito.
+**Exemplo:**
+```bash
+curl http://localhost:3000/transcription/abc123
+```
 
-`POST /generate`
+### `POST /generate`
 Gera uma resposta com base no prompt e transcrição do vídeo.
 
-Body:
+- **Body**: JSON com configurações do prompt
 
 ```json
 {
   "transcriptionId": "abc123",
-  "prompt": "Resuma o vídeo e sugira 3 livros.",
+  "prompt": "Resuma o vídeo e sugira 3 livros relacionados ao tema.",
   "temperature": 0.7
 }
 ```
-Retorno: Texto gerado pela IA.
 
-🛠️ Configuração
-Você pode ajustar a temperatura do modelo para controlar a criatividade da resposta:
-
-Temperatura baixa (ex: 0.3): Respostas mais precisas e diretas.
-
-Temperatura alta (ex: 0.9): Respostas mais criativas e variadas.
-
-💡 Variáveis Úteis no Prompt
-Você pode usar a variável `{{transcription}}` dentro do seu prompt personalizado. Exemplo:
-
-```arduino
-"Crie um título criativo para o vídeo com base no seguinte conteúdo: {{transcription}}"
+**Exemplo de resposta:**
+```json
+{
+  "result": "Este vídeo aborda conceitos de machine learning..."
+}
 ```
-📚 Exemplo de Uso
-Envie um vídeo com `POST /upload`.
 
-Aguarde o processamento e pegue o texto com `GET /transcription/:id`.
+## 🛠️ Configuração Avançada
 
-Envie um prompt com `POST /generate` para gerar título, resumo ou outra informação baseada na transcrição.
+### Controle de Temperatura
+Ajuste a criatividade das respostas da IA:
 
-✅ Status
-✅ Upload de vídeo
-✅ Transcrição automática
-✅ Geração de conteúdo com IA
-✅ Controle de temperatura
-✅ API REST pronta para integração
+- **Temperatura baixa (0.1-0.3)**: Respostas mais precisas e diretas
+- **Temperatura média (0.4-0.7)**: Equilíbrio entre precisão e criatividade
+- **Temperatura alta (0.8-1.0)**: Respostas mais criativas e variadas
 
-📌 Observações Finais
-A IA utilizada é baseada no modelo LLaMA via Groq API, garantindo velocidade e qualidade.
+### Variáveis no Prompt
+Use a variável `{{transcription}}` em seus prompts personalizados:
 
-O sistema de transcrição utiliza Whisper Large v3, oferecendo alta precisão em diversos idiomas.
+```json
+{
+  "prompt": "Crie um título criativo para o vídeo: {{transcription}}"
+}
+```
 
-Integração com Prisma para persistência dos dados.
+## 📚 Exemplo de Uso Completo
 
-🔒 Autenticação (Opcional)
-<!-- Se sua API tiver autenticação, você pode adicionar aqui -->
+1. **Upload do vídeo:**
+   ```bash
+   curl -X POST http://localhost:3000/upload -F "video=@apresentacao.mp4"
+   # Retorna: {"id": "video_123"}
+   ```
 
+2. **Obter transcrição:**
+   ```bash
+   curl http://localhost:3000/transcription/video_123
+   # Retorna: {"transcription": "Bem-vindos à apresentação..."}
+   ```
 
+3. **Gerar conteúdo com IA:**
+   ```bash
+   curl -X POST http://localhost:3000/generate \
+     -H "Content-Type: application/json" \
+     -d '{
+       "transcriptionId": "video_123",
+       "prompt": "Resuma os principais pontos em tópicos",
+       "temperature": 0.5
+     }'
+   ```
+
+## ✅ Funcionalidades Implementadas
+
+- ✅ Upload de vídeo em múltiplos formatos
+- ✅ Transcrição automática com alta precisão
+- ✅ Geração de conteúdo personalizada com IA
+- ✅ Controle de temperatura para ajuste de criatividade
+- ✅ API REST completa e documentada
+- ✅ Persistência de dados com Prisma
+
+## 🔧 Configuração do Ambiente
+
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+# Configurações do banco de dados
+DATABASE_URL="file:./dev.db"
+
+# Chave da API Groq
+GROQ_API_KEY="sua-chave-aqui"
+
+# Configurações do servidor
+PORT=3000
+NODE_ENV=development
+```
+
+## 📋 Pré-requisitos
+
+- Node.js 18+ 
+- NPM ou Yarn
+- Conta na Groq API
+- Espaço em disco para armazenamento de vídeos
+
+**Desenvolvido com ❤️ durante a nlw da rockeatseat**
