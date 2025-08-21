@@ -1,4 +1,4 @@
-# 📡 API de Processamento de Vídeos com IA
+ento# 📡 API de Processamento de Vídeos com IA
 
 Esta API permite o upload de vídeos, transcrição automática com o **Whisper Large v3** e aplicação de prompts de IA para gerar resumos, títulos, descrições, sugestões e muito mais — tudo via **requisições HTTP**. Ideal para integrações com frontends ou automações via scripts.
 
@@ -155,4 +155,4 @@ NODE_ENV=development
 - Conta na Groq API
 - Espaço em disco para armazenamento de vídeos
 
-**Desenvolvido com ❤️ durante a nlw da rockeatseat**
+**Desenvolvido com ❤️ durante o evento nlw da rockeatseat**
