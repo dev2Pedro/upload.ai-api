@@ -17,10 +17,10 @@ Esta API permite o upload de vídeos, transcrição automática com o **Whisper 
 
 ```bash
 # Clonar o repositório
-git clone https://github.com/SEU_USUARIO/sua-api.git
+git clone https://github.com/dev2Pedro/upload.ai-api
 
 # Entrar na pasta do projeto
-cd sua-api
+cd upload.ai-api
 
 # Instalar dependências
 npm install
